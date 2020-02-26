@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Задачи{% endblock %}
+
+{% block main_content %}
+<h1>Текущие задачи пользователя - {{ user.username }}</h1>
+<ul class="list-inline">
+    {% for cat in categories %}
+        <li class="list-inline-item">
+            <span>
+                <a class="badge badge-info" href={% url "tasks:list_by_cat" cat.slug %}>
+                    {{ cat.name }}
+                </a>
+            </span>
+        </li>
+        <ul id="todo-list">
+        {% for task in tasks %}
+            {% if cat in task.category.all %}
+                {% if task.is_completed %}
+                    <li class="completed">
+                        <input class='checkbox' data-uid={{ task.id }} type='checkbox' disabled='disabled' checked='checked' />
+                {% else %}
+                    <li class="">
+                        <input class='checkbox' data-uid={{ task.id }} type='checkbox' />
+                {% endif %}
+                    {% if task.priority == task.PRIORITY_HIGH %}
+                        <span class="badge badge-pill badge-danger">&nbsp;</span>
+                    {% elif task.priority == task.PRIORITY_MEDIUM %}
+                        <span class="badge badge-pill badge-secondary">&nbsp;</span>
+                    {% elif task.priority == task.PRIORITY_LOW %}
+                        <span class="badge badge-pill badge-success">&nbsp;</span>
+                    {% endif %}
+                        <a href={% url "tasks:details" task.id %}>{{ task.description }}</a>
+                        <hr />
+                    </li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    {% endfor %}
+
+    <style type="text/css">
+        .wo-category { 
+            display: None;
+        }
+    </style>
+
+        <li class="list-inline-item wo-category">
+            <span class="badge badge-info">Без категории</span>
+        </li>
+        <ul id="todo-list">
+            {% for task in tasks %}
+                {% if not task.category.count %}
+                    <style type="text/css">
+                        .wo-category { 
+                            display: inline-block;
+                        }
+                    </style>
+
+
+                    {% if task.is_completed %}
+                    <li class="completed">
+                    <input class='checkbox' data-uid={{ task.id }} type='checkbox' disabled='disabled' checked='checked' />
+                    {% else %}
+                    <li class="">
+                    <input class='checkbox' data-uid={{ task.id }} type='checkbox' />
+                    {% endif %}
+
+                    {% if task.priority == task.PRIORITY_HIGH %}
+                        <span class="badge badge-pill badge-danger">&nbsp;</span>
+                    {% elif task.priority == task.PRIORITY_MEDIUM %}
+                        <span class="badge badge-pill badge-secondary">&nbsp;</span>
+                    {% elif task.priority == task.PRIORITY_LOW %}
+                        <span class="badge badge-pill badge-success">&nbsp;</span>
+                    {% endif %}
+                        <a href={% url "tasks:details" task.id %}>{{ task.description }}</a>
+                        <hr />
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+</ul>
+
+{% endblock %}
